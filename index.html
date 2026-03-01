@@ -145,7 +145,7 @@
                 <img src="https://lh3.googleusercontent.com/d/140mCYpVaKgu7rWrwwCpUrtxqc1Aqi4Pb" alt="Logo Central" class="h-auto w-64 md:w-96 max-w-full object-contain drop-shadow-xl transform hover:scale-105 transition duration-500 rounded-3xl p-0"> 
             </div>
 
-            <!-- MENÚ PRINCIPAL (Actualizado a 2 Columnas para 4 items) -->
+            <!-- MENÚ PRINCIPAL -->
             <div id="home-menu" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 max-w-5xl mx-auto mt-4 fade-in relative z-30">
                 <button onclick="enterSection('standing')" class="mlb-card group relative p-6 rounded-2xl text-left hover:border-pega-gold transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl cursor-pointer bg-white">
                     <div class="absolute inset-0 bg-gradient-to-br from-red-50 to-transparent opacity-0 group-hover:opacity-100 transition duration-500 rounded-2xl"></div>
@@ -168,11 +168,10 @@
                         <i data-lucide="trophy" class="w-8 h-8 md:w-10 md:h-10 text-slate-300 group-hover:text-pega-gold group-hover:scale-110 transition duration-500"></i>
                     </div>
                 </button>
-                <!-- NUEVO BOTÓN LANZADORES -->
                 <button onclick="enterSection('pitchers')" class="mlb-card group relative p-6 rounded-2xl text-left hover:border-pega-gold transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl cursor-pointer bg-white">
                     <div class="absolute inset-0 bg-gradient-to-br from-blue-50 to-transparent opacity-0 group-hover:opacity-100 transition duration-500 rounded-2xl"></div>
                     <div class="relative z-10 flex items-center justify-between">
-                        <div><h2 class="text-2xl md:text-4xl font-sport text-slate-900 mb-1 group-hover:text-pega-gold transition">LANZADORES</h2><p class="text-slate-500 text-xs md:text-sm">Dominio en la loma</p></div>
+                        <div><h2 class="text-2xl md:text-4xl font-sport text-slate-900 mb-1 group-hover:text-pega-gold transition">LANZADORES</h2><p class="text-slate-500 text-xs md:text-sm">Conteo de pitcheos</p></div>
                         <i data-lucide="circle-dot" class="w-8 h-8 md:w-10 md:h-10 text-slate-300 group-hover:text-pega-gold group-hover:scale-110 transition duration-500"></i>
                     </div>
                 </button>
@@ -192,11 +191,14 @@
             <div class="flex items-center justify-between mb-3 px-1"><h3 class="font-sport text-lg md:text-2xl text-pega-gold uppercase flex items-center gap-2"><i data-lucide="calendar-days" class="w-4 h-4 md:w-6 md:h-6"></i> Resultados Recientes</h3></div>
             <div id="results-scroller" class="flex gap-3 overflow-x-auto custom-scrollbar pb-4 px-1 snap-x snap-mandatory"></div>
         </div>
+
         <div id="data-container" class="hidden fade-in space-y-6 mt-2"></div>
+
         <div id="concentrados-section" class="hidden fade-in mt-4">
             <h3 class="font-sport text-2xl text-slate-900 text-center mb-6 uppercase tracking-wide border-b border-gray-200 pb-2">Directorio de Equipos</h3>
             <div id="concentrados-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
         </div>
+
         <div id="analysis-wrapper" class="hidden mt-8 max-w-5xl mx-auto fade-in">
             <button onclick="generateStaticAnalysis()" id="btn-analyze" class="w-full bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 text-white font-black py-4 rounded-xl shadow-lg transform transition hover:scale-105 flex items-center justify-center gap-3 text-lg md:text-xl border border-white/20 group cursor-pointer z-30 relative"><i data-lucide="bar-chart-3" class="w-5 h-5 md:w-6 md:h-6 text-white group-hover:animate-pulse"></i>ANALIZAR EQUIPO POR EQUIPO</button>
             <div id="analysis-result" class="hidden mt-6 bg-white border border-gray-200 rounded-xl p-4 md:p-6 shadow-2xl relative overflow-hidden">
@@ -223,7 +225,10 @@
 
     <footer class="bg-white text-slate-500 py-8 border-t border-gray-200 mt-auto relative z-20"><div class="max-w-7xl mx-auto px-4 flex justify-between items-center"><span class="text-[10px] md:text-xs font-medium tracking-wider">© 2025 LIGA DE BEISBOL PEQUEÑO COLHUACAN</span><button onclick="openUploadModal()" class="text-[9px] uppercase font-bold tracking-widest bg-gray-100 px-3 py-2 rounded-full hover:bg-pega-gold hover:text-white transition text-slate-600">Acceso Capitanes</button></div></footer>
 
+    <!-- LOGICA DEL SITIO -->
     <script>
+        window.currentJornada = 1;
+
         const BASE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRGTo3bXEvL_J54VjF26ilMUnTDPLXo0wkDTqdJ86I75WfDUyCu4lfeMupwOqL3KnJsAz4QPAy7oBw0/pub";
         const BASE_RESULTS_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR46Kv8lY9vPth9ztaF8l1sruX8wgNBTzvBIsl1i0c2bK0MI_PiLdaU1sKrTQOE3yGuEeY5owNK43gZ/pub";
         const SHARED_CATEGORIES_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS1I9Ic6G3J-pPw1JqxsQbK5kbFxb8XuAC5ogvZS_wo1g9SKKWScgOfF-guEgxTECfZqu1x0HqUPBN6/pub?output=csv';
@@ -231,25 +236,44 @@
         const HR_LEADERS_URL = 'https://docs.google.com/spreadsheets/d/1uWHj59A-Z1ty9FGUSGhtve2xq74mFuFStwR96Xi4_6Q/export?format=csv&gid=910137557';
         const JG_LEADERS_URL = 'https://docs.google.com/spreadsheets/d/1uWHj59A-Z1ty9FGUSGhtve2xq74mFuFStwR96Xi4_6Q/export?format=csv&gid=1289562111';
 
-        const CACHE_VERSION = "v1.39_fix_reference_error";
+        const CACHE_VERSION = "v1.47_all_categories_logos";
         const CACHE_DURATION = 60 * 60 * 1000; 
 
         const TABS = [
-            { id: 'escuelita', name: 'ESCUELITA', customUrl: SHARED_CATEGORIES_URL, type: 'standing', sliceStart: 0, sliceEnd: 8, hideLogo: true, rosterId: '1WO0IrL5c9GSlhV15-To_LJJlDnRl1XTvm8zU_HoHHUw', resultsGid: '0' }, 
-            { id: 'pinguica', name: 'PINGUICA', customUrl: SHARED_CATEGORIES_URL, type: 'standing', sliceStart: 8, sliceEnd: 16, hideLogo: true, rosterId: '1wpmpO5sOgzwZ-q6P9C6mUQH73d9OEBEu7ttgsEWwqbw', resultsGid: '0' },
-            { id: 'inf-menor', name: 'INF. MENOR', customUrl: SHARED_CATEGORIES_URL, type: 'standing', sliceStart: 16, sliceEnd: 24, hideLogo: true, rosterId: '14ewOKn1h0rjvBJamykyFWUg8OkFGwyLW8PzcunWk35M', resultsGid: '0' },
-            { id: 'inf-mayor', name: 'INF. MAYOR', customUrl: SHARED_CATEGORIES_URL, type: 'standing', sliceStart: 24, sliceEnd: 32, hideLogo: true, rosterId: '1et-lrJeeZlBvlxR6Ixw7K3bxr6LbQetm7TJKVIww4IY', resultsGid: '0' },
-            { id: 'juv-menor', name: 'JUV. MENOR', customUrl: SHARED_CATEGORIES_URL, type: 'standing', sliceStart: 32, sliceEnd: 39, hideLogo: true, rosterId: '1M8xjAC3VlNFxvtbotciFejTB_Kq54b77wv2TQrXRjZs', resultsGid: '0' },
+            { 
+                id: 'escuelita', name: 'ESCUELITA', customUrl: SHARED_CATEGORIES_URL, type: 'standing', sliceStart: 0, sliceEnd: 8, 
+                hideLogo: false, rosterId: '1WO0IrL5c9GSlhV15-To_LJJlDnRl1XTvm8zU_HoHHUw', resultsGid: '0',
+                teamCol: 1, jjCol: 2, jgCol: 3, jeCol: 4, jpCol: 5, cfCol: 6, ccCol: 7, difCol: 8, logoCol: 10
+            }, 
+            { 
+                id: 'pinguica', name: 'PINGUICA', customUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vStTdSz0minKt_Bu4u8-pyRJbqa4CO97xqVLdvBcSL_bkPLpQdkW24dRYuZhn5S4AlSjBD3cFAgwI-e/pub?gid=777864726&single=true&output=csv', type: 'standing', 
+                hideLogo: false, rosterId: '1wpmpO5sOgzwZ-q6P9C6mUQH73d9OEBEu7ttgsEWwqbw', resultsGid: '0',
+                teamCol: 1, jjCol: 2, jgCol: 3, jeCol: 4, jpCol: 5, cfCol: 6, ccCol: 7, difCol: 8, logoCol: 10
+            },
+            { 
+                id: 'inf-menor', name: 'INF. MENOR', customUrl: SHARED_CATEGORIES_URL, type: 'standing', sliceStart: 16, sliceEnd: 24, 
+                hideLogo: false, rosterId: '14ewOKn1h0rjvBJamykyFWUg8OkFGwyLW8PzcunWk35M', resultsGid: '0',
+                teamCol: 1, jjCol: 2, jgCol: 3, jeCol: 4, jpCol: 5, cfCol: 6, ccCol: 7, difCol: 8, logoCol: 10
+            },
+            { 
+                id: 'inf-mayor', name: 'INF. MAYOR', customUrl: SHARED_CATEGORIES_URL, type: 'standing', sliceStart: 24, sliceEnd: 32, 
+                hideLogo: false, rosterId: '1et-lrJeeZlBvlxR6Ixw7K3bxr6LbQetm7TJKVIww4IY', resultsGid: '0',
+                teamCol: 1, jjCol: 2, jgCol: 3, jeCol: 4, jpCol: 5, cfCol: 6, ccCol: 7, difCol: 8, logoCol: 10
+            },
+            { 
+                id: 'juv-menor', name: 'JUV. MENOR', customUrl: SHARED_CATEGORIES_URL, type: 'standing', sliceStart: 32, sliceEnd: 39, 
+                hideLogo: false, rosterId: '1M8xjAC3VlNFxvtbotciFejTB_Kq54b77wv2TQrXRjZs', resultsGid: '0',
+                teamCol: 1, jjCol: 2, jgCol: 3, jeCol: 4, jpCol: 5, cfCol: 6, ccCol: 7, difCol: 8, logoCol: 10
+            },
             
             { id: 'leader-avg', name: 'AVG', customUrl: AVG_LEADERS_URL, type: 'leader', colStart: 0, nameCol: 0, teamCol: 1, statCol: 2, icon: 'crosshair', color: 'from-blue-600 to-blue-800', label: 'AVG' },
             { id: 'leader-hr', name: 'HR', customUrl: HR_LEADERS_URL, type: 'leader', colStart: 0, nameCol: 0, teamCol: 1, statCol: 2, icon: 'zap', color: 'from-red-600 to-red-800', label: 'HR' },
             { id: 'leader-jg', name: 'JG', customUrl: JG_LEADERS_URL, type: 'leader', colStart: 0, nameCol: 0, teamCol: 1, statCol: 2, icon: 'trophy', color: 'from-yellow-500 to-yellow-700', label: 'JG' },
 
-            // NUEVOS TABS DE LANZADORES
-            { id: 'pitcher-pinguica', name: 'PINGUICA', customUrl: 'https://docs.google.com/spreadsheets/d/19k2yK4hpIH6eCetMPjkJxHp9YBcOGt1grdoviChI9Dk/export?format=csv&gid=1486617296', type: 'pitchers', colStart: 0, nameCol: 0, teamCol: 1, statCol: 2 },
-            { id: 'pitcher-inf-menor', name: 'INF. MENOR', customUrl: 'https://docs.google.com/spreadsheets/d/1uWHj59A-Z1ty9FGUSGhtve2xq74mFuFStwR96Xi4_6Q/export?format=csv&gid=1807165843', type: 'pitchers', colStart: 0, nameCol: 0, teamCol: 1, statCol: 2 },
-            { id: 'pitcher-inf-mayor', name: 'INF. MAYOR', customUrl: 'https://docs.google.com/spreadsheets/d/1xHoUzjfZz7AUGq1cOMYZeubLCXCCXSsvWjrGbpAd_pQ/export?format=csv&gid=1956059983', type: 'pitchers', colStart: 0, nameCol: 0, teamCol: 1, statCol: 2 },
-            { id: 'pitcher-juv-menor', name: 'JUV. MENOR', customUrl: 'https://docs.google.com/spreadsheets/d/1KrCUR-402Fyfy_fVi4zI9J-3vtEfB79IlWGhnluSyTA/export?format=csv&gid=563800804', type: 'pitchers', colStart: 0, nameCol: 0, teamCol: 1, statCol: 2 }
+            { id: 'pitcher-pinguica', name: 'PINGUICA', customUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vStTdSz0minKt_Bu4u8-pyRJbqa4CO97xqVLdvBcSL_bkPLpQdkW24dRYuZhn5S4AlSjBD3cFAgwI-e/pub?gid=149099841&single=true&output=csv', type: 'pitchers' },
+            { id: 'pitcher-inf-menor', name: 'INF. MENOR', customUrl: 'https://docs.google.com/spreadsheets/d/1uWHj59A-Z1ty9FGUSGhtve2xq74mFuFStwR96Xi4_6Q/export?format=csv&gid=1807165843', type: 'pitchers' },
+            { id: 'pitcher-inf-mayor', name: 'INF. MAYOR', customUrl: 'https://docs.google.com/spreadsheets/d/1xHoUzjfZz7AUGq1cOMYZeubLCXCCXSsvWjrGbpAd_pQ/export?format=csv&gid=1956059983', type: 'pitchers' },
+            { id: 'pitcher-juv-menor', name: 'JUV. MENOR', customUrl: 'https://docs.google.com/spreadsheets/d/1KrCUR-402Fyfy_fVi4zI9J-3vtEfB79IlWGhnluSyTA/export?format=csv&gid=563800804', type: 'pitchers' }
         ];
 
         const DISPLAY_ORDER_PRIORITY = [ "ESCUELITA", "PINGUICA", "INF. MENOR", "INF. MAYOR", "JUV. MENOR" ];
@@ -323,7 +347,7 @@
             const activeTab = TABS.find(t => t.id === currentTabId);
             const currentRosterId = activeTab ? activeTab.rosterId : null;
             if (!globalData || globalData.length === 0) { showToast("No hay datos para analizar.", "error"); return; }
-            if (!currentRosterId) { showToast("No hay hoja de concentrados configurada para este grupo.", "warning"); return; }
+            if (!currentRosterId) { showToast("No hoja de concentrados para este grupo.", "warning"); return; }
             const originalText = btn.innerHTML;
             btn.innerHTML = `<i data-lucide="loader-2" class="w-6 h-6 animate-spin"></i> ESCANEANDO ROSTERS...`;
             btn.disabled = true;
@@ -333,8 +357,28 @@
                     if (activeTeams.length === 0) { contentDiv.innerHTML = `<div class="p-4 text-center text-slate-500">La temporada aún no comienza.</div>`; resultContainer.classList.remove('hidden'); btn.disabled = false; btn.innerHTML = originalText; return; }
                     let reportsHTML = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">`;
                     const analysisPromises = activeTeams.map(async (team) => {
-                        const pos = team[0]; const name = team[1]; const jg = parseInt(team[3]) || 0; const jp = parseInt(team[5]) || 0; const dif = parseInt(team[8]) || 0; const jj = parseInt(team[2]) || 0; const pct = jj > 0 ? jg / jj : 0;
-                        const topPlayers = await analyzeTeamRoster(name, currentRosterId);
+                        const pos = team[0]; const name = team[1]; const teamKey = name.toUpperCase().trim(); const jg = parseInt(team[3]) || 0; const jp = parseInt(team[5]) || 0; const dif = parseInt(team[8]) || 0; const jj = parseInt(team[2]) || 0; const pct = jj > 0 ? jg / jj : 0;
+                        
+                        let topPlayers = await analyzeTeamRoster(name, currentRosterId);
+
+                        if (!topPlayers || topPlayers.length === 0) {
+                            let globalLeadersForTeam = window.teamDetailedStats[teamKey] || [];
+                            if (globalLeadersForTeam.length > 0) {
+                                let uniquePlayers = [];
+                                let seenNames = new Set();
+                                globalLeadersForTeam.forEach(p => {
+                                    if (!seenNames.has(p.name)) {
+                                        seenNames.add(p.name);
+                                        uniquePlayers.push({ name: p.name, stats: [`${p.value} ${p.type}`] });
+                                    } else {
+                                        let existing = uniquePlayers.find(up => up.name === p.name);
+                                        if (existing) existing.stats.push(`${p.value} ${p.type}`);
+                                    }
+                                });
+                                topPlayers = uniquePlayers.slice(0, 3);
+                            }
+                        }
+
                         let analysisTitle = "Análisis de Plantilla"; let analysisText = ""; let hasPlayers = topPlayers && topPlayers.length > 0;
                         if (hasPlayers) {
                             analysisTitle = "Jugadores Determinantes";
@@ -343,10 +387,17 @@
                             else if (playerList.length === 2) analysisText = `La dupla clave: ${playerList[0]} y ${playerList[1]} son los motores del equipo.`;
                             else analysisText = `Tridente ofensivo/defensivo: <ul class="list-disc list-inside mt-1 ml-1 text-slate-700 space-y-0.5"><li>${playerList[0]}</li><li>${playerList[1]}</li><li>${playerList[2]}</li></ul>`;
                         } else {
-                            analysisTitle = "Desempeño Colectivo"; const cf = parseInt(team[6]) || 0; const avgRunsFor = jj > 0 ? (cf / jj).toFixed(1) : 0;
+                            analysisTitle = "Desempeño Colectivo"; 
+                            const cf = parseInt(team[6]) || 0; 
+                            const cc = parseInt(team[7]) || 0;
+                            const avgRunsFor = jj > 0 ? (cf / jj).toFixed(1) : 0;
+                            const avgRunsAgainst = jj > 0 ? (cc / jj).toFixed(1) : 0;
+
                             if (jj === 0) analysisText = "Sin datos suficientes. El equipo se prepara para debutar.";
-                            else if (dif > 0) analysisText = `Equipo balanceado con promedio de <strong>${avgRunsFor} carreras</strong> por juego.`;
-                            else analysisText = `En proceso de estructuración. Necesitan mejorar diferencial (${dif}).`;
+                            else if (dif >= 15) analysisText = `Dominio absoluto en el diamante, anotando un promedio de <strong>${avgRunsFor} carreras</strong> por juego.`;
+                            else if (dif > 0) analysisText = `Equipo balanceado. Anotan ${avgRunsFor} y permiten ${avgRunsAgainst} carreras en promedio, mostrando un juego de conjunto sólido.`;
+                            else if (avgRunsAgainst < 5) analysisText = `Pitcheo y defensa muy efectivos, limitando a sus rivales a solo <strong>${avgRunsAgainst} carreras</strong> en contra por juego.`;
+                            else analysisText = `En proceso de ajustes tácticos. Necesitan mejorar su diferencial de carreras (${dif}) para escalar posiciones.`;
                         }
                         let statusColor = "border-gray-300"; let badgeClass = "bg-gray-100 text-slate-600"; let badgeText = "EN AJUSTE"; let keyStat = ""; 
                         if (jj === 0) { badgeText = "PRETEMPORADA"; keyStat = "Prep"; } else if (pct === 1.0 && jj >= 2) { statusColor = "border-red-600"; badgeClass = "bg-red-600 text-white font-black animate-pulse"; badgeText = "🔥 INVICTO"; keyStat = `Racha ${jg}-0`; } else if (pct >= 0.60) { statusColor = "border-green-600"; badgeClass = "bg-green-100 text-green-800 font-bold"; badgeText = "CONTENDIENTE"; keyStat = `Dif +${dif}`; } else if (pct >= 0.40) { statusColor = "border-blue-500"; badgeClass = "bg-blue-50 text-blue-700 font-bold"; badgeText = "COMPETITIVO"; keyStat = `.500 ball`; }
@@ -364,6 +415,8 @@
         }
 
         // ----- FUNCIONES UI & CARGA -----
+        
+        // FUNCIÓN CLAVE CORREGIDA PARA CONCENTRADOS
         function renderConcentradosMenu() {
             const container = document.getElementById('concentrados-grid');
             const groups = TABS.filter(t => t.type === 'standing');
@@ -382,10 +435,31 @@
                     try {
                         const csvUrl = groupConfig.customUrl ? groupConfig.customUrl : `${BASE_SHEET_URL}?gid=${groupConfig.gid}&single=true&output=csv`;
                         let text = await fetchWithCache(csvUrl); let rows = parseCSV(text);
-                        if (groupConfig.sliceStart !== undefined) rows = rows.slice(groupConfig.sliceStart, groupConfig.sliceEnd); else if (groupConfig.maxRows) rows = rows.slice(0, groupConfig.maxRows);
-                        const teams = rows.filter(r => { const nameIndex = groupConfig.hideLogo ? 1 : 2; const name = r[nameIndex] ? r[nameIndex].trim() : ""; return name && !name.toUpperCase().includes("EQUIPO") && !name.toUpperCase().includes("GRUPO") && name !== "-" && name !== "FOTO" && name !== "0"; }).map(r => ({ name: r[groupConfig.hideLogo ? 1 : 2].trim(), logo: groupConfig.hideLogo ? "" : (r[1] ? r[1].trim() : "") }));
+                        
+                        // CORRECCIÓN: Usar índices específicos de cada categoría
+                        let tc = groupConfig.teamCol !== undefined ? groupConfig.teamCol : (groupConfig.hideLogo ? 1 : 2);
+                        let lc = groupConfig.logoCol !== undefined ? groupConfig.logoCol : 1;
+
+                        const teams = rows.filter(r => { 
+                            const name = r[tc] ? r[tc].trim() : ""; 
+                            // Filtro estricto para ignorar encabezados
+                            return name && !name.toUpperCase().includes("EQUIPO") && !name.toUpperCase().includes("GRUPO") && !name.toUpperCase().includes("POS") && name !== "-" && name !== "FOTO" && name !== "0"; 
+                        }).map(r => ({ 
+                            name: r[tc].trim(), 
+                            logo: groupConfig.hideLogo ? "" : (r[lc] ? r[lc].trim() : "") 
+                        }));
+
                         if (teams.length > 0) {
-                            listEl.innerHTML = `<div class="grid grid-cols-1 divide-y divide-gray-100">${teams.map(team => { let logoHtml = createAvatarHtml(team.name, "mr-3"); if (team.logo && team.logo.length > 5 && team.logo !== '#N/A') { let finalUrl = team.logo; const match = team.logo.match(/(?:id=|d\/)([a-zA-Z0-9_-]+)/); if (match && match[1]) finalUrl = `https://lh3.googleusercontent.com/d/${match[1]}`; logoHtml = `<img src="${finalUrl}" class="w-8 h-8 object-contain mr-3 flex-shrink-0" onerror="handleImageError(this, '${team.name.replace(/'/g, "\\'")}')">`; } return `<button onclick="openTeamStats('${team.name.replace(/'/g, "\\'")}', '${groupConfig.rosterId}', '${team.logo || ''}')" class="w-full text-left p-3 text-slate-700 text-sm font-bold uppercase tracking-wide hover:bg-gray-50 transition flex items-center group/item">${logoHtml}<span>${team.name}</span></button>`; }).join('')}</div>`;
+                            listEl.innerHTML = `<div class="grid grid-cols-1 divide-y divide-gray-100">${teams.map(team => { 
+                                let logoHtml = createAvatarHtml(team.name, "mr-3"); 
+                                if (team.logo && team.logo.length > 5 && team.logo !== '#N/A') { 
+                                    let finalUrl = team.logo; 
+                                    const match = team.logo.match(/(?:id=|d\/)([a-zA-Z0-9_-]+)/); 
+                                    if (match && match[1]) finalUrl = `https://lh3.googleusercontent.com/d/${match[1]}`; 
+                                    logoHtml = `<img src="${finalUrl}" class="w-8 h-8 object-contain mr-3 flex-shrink-0" onerror="handleImageError(this, '${team.name.replace(/'/g, "\\'")}')">`; 
+                                } 
+                                return `<button onclick="openTeamStats('${team.name.replace(/'/g, "\\'")}', '${groupConfig.rosterId}', '${team.logo || ''}')" class="w-full text-left p-3 text-slate-700 text-sm font-bold uppercase tracking-wide hover:bg-gray-50 transition flex items-center group/item">${logoHtml}<span>${team.name}</span></button>`; 
+                            }).join('')}</div>`;
                         } else { listEl.innerHTML = `<div class="p-4 text-slate-500 text-sm text-center">Sin equipos registrados</div>`; }
                         refreshIcons();
                     } catch (e) { console.error(e); listEl.innerHTML = `<div class="p-4 text-red-400 text-sm text-center">Error al cargar</div>`; }
@@ -393,7 +467,7 @@
             } else { listEl.classList.add('hidden'); iconEl.style.transform = 'rotate(0deg)'; }
         }
 
-        function openTeamForm(teamName) { window.open("https://docs.google.com/forms/d/e/1FAIpQLSc3wt98a9Sj-E--y_WBnh7e6DZvt6bbg8SGBo_wtIfAlY5K6Q/viewform?usp=pp_url&entry.185157486=" + encodeURIComponent(teamName), '_blank'); }
+        function openTeamForm(teamName) { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfqq3hvKxtYb7wUlEXmlnpzkH74RvcWT-pj3QY4L6FyfAaBpA/viewform?usp=pp_url&entry.185157486=" + encodeURIComponent(teamName), '_blank'); }
 
         async function openTeamStats(teamName, rosterSheetId, logoUrl = "") {
             const modal = document.getElementById('teamStatsModal'); const content = document.getElementById('teamStatsContent'); document.getElementById('modalTeamNameText').textContent = teamName;
@@ -414,10 +488,74 @@
             refreshIcons();
         }
 
+        function changeJornada(j) {
+            window.currentJornada = parseInt(j);
+            loadCurrentTab(false);
+        }
+        window.changeJornada = changeJornada;
+
+        function renderPitchersTable(data, tabName) {
+            const container = document.getElementById('data-container');
+            
+            let selectorHtml = `
+            <div class="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6">
+                <div class="flex items-center gap-3 mb-3 sm:mb-0">
+                    <div class="bg-blue-100 p-2 rounded-full"><i data-lucide="activity" class="w-5 h-5 text-blue-700"></i></div>
+                    <div>
+                        <h3 class="font-sport text-xl text-slate-800 uppercase leading-none">Conteo de Pitcheos</h3>
+                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">${tabName}</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">Jornada:</label>
+                    <select onchange="changeJornada(this.value)" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-pega-gold focus:border-pega-gold block p-2.5 font-bold outline-none cursor-pointer">
+                        ${Array.from({length: 15}, (_, i) => `<option value="${i+1}" ${window.currentJornada == i+1 ? 'selected' : ''}>Jornada ${i+1}</option>`).join('')}
+                    </select>
+                </div>
+            </div>
+            `;
+
+            let html = selectorHtml + `<div class="mlb-card rounded-xl overflow-hidden shadow-xl bg-white"><div class="overflow-x-auto custom-scrollbar"><table class="w-full whitespace-nowrap"><thead class="bg-gray-100 text-slate-800 font-[Teko] border-b border-gray-200"><tr><th class="px-4 py-4 text-center tracking-wider text-xl font-bold text-slate-700">EQUIPO</th><th class="px-4 py-4 text-left tracking-wider text-xl font-bold text-slate-700">PITCHER</th><th class="px-4 py-4 text-center tracking-wider text-xl font-bold text-slate-700">LANZAMIENTOS</th></tr></thead><tbody class="divide-y divide-gray-100">`;
+            
+            if (data.length === 0) {
+                html += `<tr><td colspan="3" class="p-12 text-center"><i data-lucide="calendar-x" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i><p class="text-slate-500 font-medium">No hay registros de lanzadores para la Jornada ${window.currentJornada}.</p></td></tr>`;
+            } else {
+                html += data.map((row, i) => {
+                    const team = row.team || '-';
+                    const name = row.name || '-';
+                    const pitches = parseInt(row.pitches) || 0;
+                    
+                    let pitchColor = "text-blue-700";
+                    if (pitches > 60) pitchColor = "text-red-600";
+                    else if (pitches > 40) pitchColor = "text-orange-500";
+
+                    return `<tr class="hover:bg-gray-50 transition text-slate-700">
+                        <td class="px-4 py-3 text-center text-slate-500 uppercase text-xs font-bold">${team}</td>
+                        <td class="px-4 py-3 font-bold text-slate-900 uppercase font-sport text-xl tracking-wide">
+                            <div class="flex items-center gap-3">
+                                ${createAvatarHtml(name, "w-8 h-8 md:w-10 md:h-10")}
+                                <span>${name}</span>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 text-center font-black font-sport text-3xl tracking-widest ${pitchColor}">${pitches > 0 ? pitches : row.pitches}</td>
+                    </tr>`;
+                }).join('');
+            }
+            html += `</tbody></table></div></div>`;
+            container.innerHTML = html;
+            refreshIcons();
+        }
+
         function renderStandings(data, config) { 
             const container = document.getElementById('data-container');
             let headers = ['POS', 'LOGO', 'EQUIPO', 'JJ', 'JG', 'JE', 'JP', 'CF', 'CC', 'DIF']; if (config && config.hideLogo) headers = ['POS', 'EQUIPO', 'JJ', 'JG', 'JE', 'JP', 'CF', 'CC', 'DIF'];
-            let html = `<div class="mlb-card rounded-xl overflow-hidden shadow-xl bg-white"><div class="overflow-x-auto custom-scrollbar"><table class="w-full whitespace-nowrap"><thead class="bg-gray-100 text-slate-800 font-[Teko] border-b border-gray-200"><tr>${headers.map(h => `<th class="px-0.5 py-1 md:px-4 md:py-4 text-center tracking-wider text-[10px] md:text-xl font-bold text-slate-700">${h}</th>`).join('')}</tr></thead><tbody class="divide-y divide-gray-100">${data.map(row => { const pos = row[0]; let rowClass = 'hover:bg-gray-50 transition text-center font-medium text-slate-700'; let posBadge = 'bg-slate-200 text-slate-600'; if(pos==1) { posBadge='gold-gradient text-white shadow-md shadow-red-500/30'; rowClass += ' bg-red-50/50'; } if(pos==2) { posBadge='silver-gradient text-slate-800'; } if(pos==3) { posBadge='bronze-gradient text-white'; } const get = i => row[i] || '-'; const teamName = get(1); let logoHtml = ""; if (!config || !config.hideLogo) { logoHtml = createAvatarHtml(teamName); const rawLogoUrl = row[9]; if (rawLogoUrl && rawLogoUrl.length > 5 && rawLogoUrl !== '#N/A' && !rawLogoUrl.includes(" ")) { let finalUrl = rawLogoUrl; const match = rawLogoUrl.match(/(?:id=|d\/)([a-zA-Z0-9_-]+)/); if (match && match[1]) finalUrl = `https://lh3.googleusercontent.com/d/${match[1]}`; logoHtml = `<img src="${finalUrl}" class="w-10 h-10 md:w-16 md:h-16 object-contain mx-auto" referrerpolicy="no-referrer" onerror="handleImageError(this, '${teamName.replace(/'/g, "\\'")}')">`; } } return `<tr class="${rowClass}"><td class="px-0.5 py-1 md:px-4 md:py-4"><span class="inline-flex w-4 h-4 md:w-8 md:h-8 rounded items-center justify-center text-[9px] md:text-sm font-black ${posBadge}">${pos}</span></td>${(!config || !config.hideLogo) ? `<td class="px-0.5 py-1 md:px-4 md:py-4 text-center">${logoHtml}</td>` : ''}<td class="px-0.5 py-1 md:px-4 md:py-4 text-center"><div onclick="openTeamForm('${teamName.replace(/'/g, "\\'")}')" class="cursor-pointer hover:text-pega-gold transition-colors font-[Teko] font-bold text-slate-900 text-sm md:text-3xl tracking-wide uppercase truncate max-w-[100px] md:max-w-none leading-none mx-auto whitespace-normal break-words" title="Clic para subir foto">${teamName}</div></td><td class="px-0.5 py-1 md:px-4 md:py-4 text-center font-[Teko] text-sm md:text-3xl text-slate-800">${get(2)}</td><td class="px-0.5 py-1 md:px-4 md:py-4 text-center font-[Teko] text-sm md:text-3xl font-bold text-green-600">${get(3)}</td><td class="px-0.5 py-1 md:px-4 md:py-4 text-center font-[Teko] text-sm md:text-3xl text-slate-800">${get(4)}</td><td class="px-0.5 py-1 md:px-4 md:py-4 text-center font-[Teko] text-sm md:text-3xl font-bold text-red-600">${get(5)}</td><td class="px-0.5 py-1 md:px-4 md:py-4 text-center font-[Teko] text-sm md:text-3xl text-slate-600">${get(6)}</td><td class="px-0.5 py-1 md:px-4 md:py-4 text-center font-[Teko] text-sm md:text-3xl text-slate-600">${get(7)}</td><td class="px-0.5 py-1 md:px-4 md:py-4 text-center"><span class="font-[Teko] font-black text-slate-900 text-sm md:text-3xl tracking-widest bg-gray-100 rounded px-1 md:px-2 border border-gray-200">${get(8)}</span></td></tr>`; }).join('')}</tbody></table></div></div>`;
+            let html = `<div class="mlb-card rounded-xl overflow-hidden shadow-xl bg-white"><div class="overflow-x-auto custom-scrollbar"><table class="w-full whitespace-nowrap"><thead class="bg-gray-100 text-slate-800 font-[Teko] border-b border-gray-200"><tr>${headers.map(h => `<th class="px-0.5 py-1 md:px-4 md:py-4 text-center tracking-wider text-[10px] md:text-xl font-bold text-slate-700">${h}</th>`).join('')}</tr></thead><tbody class="divide-y divide-gray-100">${data.map(row => { 
+                const pos = row[0]; const teamName = row[1] || '-'; const jj = row[2] || '-'; const jg = row[3] || '-'; const je = row[4] || '-'; const jp = row[5] || '-'; const cf = row[6] || '-'; const cc = row[7] || '-'; const dif = row[8] || '-'; const rawLogoUrl = row[9];
+                let rowClass = 'hover:bg-gray-50 transition text-center font-medium text-slate-700'; let posBadge = 'bg-slate-200 text-slate-600'; 
+                if(pos==1) { posBadge='gold-gradient text-white shadow-md shadow-red-500/30'; rowClass += ' bg-red-50/50'; } if(pos==2) { posBadge='silver-gradient text-slate-800'; } if(pos==3) { posBadge='bronze-gradient text-white'; } 
+                let logoHtml = ""; if (!config || !config.hideLogo) { logoHtml = createAvatarHtml(teamName); if (rawLogoUrl && rawLogoUrl.length > 5 && rawLogoUrl !== '#N/A' && !rawLogoUrl.includes(" ")) { let finalUrl = rawLogoUrl; const match = rawLogoUrl.match(/(?:id=|d\/)([a-zA-Z0-9_-]+)/); if (match && match[1]) finalUrl = `https://lh3.googleusercontent.com/d/${match[1]}`; logoHtml = `<img src="${finalUrl}" class="w-10 h-10 md:w-16 md:h-16 object-contain mx-auto" referrerpolicy="no-referrer" onerror="handleImageError(this, '${teamName.replace(/'/g, "\\'")}')">`; } } 
+                return `<tr class="${rowClass}"><td class="px-0.5 py-1 md:px-4 md:py-4"><span class="inline-flex w-4 h-4 md:w-8 md:h-8 rounded items-center justify-center text-[9px] md:text-sm font-black ${posBadge}">${pos}</span></td>${(!config || !config.hideLogo) ? `<td class="px-0.5 py-1 md:px-4 md:py-4 text-center">${logoHtml}</td>` : ''}<td class="px-0.5 py-1 md:px-4 md:py-4 text-center"><div onclick="openTeamForm('${teamName.replace(/'/g, "\\'")}')" class="cursor-pointer hover:text-pega-gold transition-colors font-[Teko] font-bold text-slate-900 text-sm md:text-3xl tracking-wide uppercase truncate max-w-[100px] md:max-w-none leading-none mx-auto whitespace-normal break-words" title="Clic para subir foto">${teamName}</div></td><td class="px-0.5 py-1 md:px-4 md:py-4 text-center font-[Teko] text-sm md:text-3xl text-slate-800">${jj}</td><td class="px-0.5 py-1 md:px-4 md:py-4 text-center font-[Teko] text-sm md:text-3xl font-bold text-green-600">${jg}</td><td class="px-0.5 py-1 md:px-4 md:py-4 text-center font-[Teko] text-sm md:text-3xl text-slate-800">${je}</td><td class="px-0.5 py-1 md:px-4 md:py-4 text-center font-[Teko] text-sm md:text-3xl font-bold text-red-600">${jp}</td><td class="px-0.5 py-1 md:px-4 md:py-4 text-center font-[Teko] text-sm md:text-3xl text-slate-600">${cf}</td><td class="px-0.5 py-1 md:px-4 md:py-4 text-center font-[Teko] text-sm md:text-3xl text-slate-600">${cc}</td><td class="px-0.5 py-1 md:px-4 md:py-4 text-center"><span class="font-[Teko] font-black text-slate-900 text-sm md:text-3xl tracking-widest bg-gray-100 rounded px-1 md:px-2 border border-gray-200">${dif}</span></td></tr>`; 
+            }).join('')}</tbody></table></div></div>`;
             container.innerHTML = html;
         }
 
@@ -432,39 +570,6 @@
             html += `</div>`; container.innerHTML = html;
         }
 
-        // NUEVA FUNCIÓN PARA TABLA DE LANZADORES
-        function renderPitchersTable(data) {
-            const container = document.getElementById('data-container');
-            let html = `<div class="mlb-card rounded-xl overflow-hidden shadow-xl bg-white"><div class="overflow-x-auto custom-scrollbar"><table class="w-full whitespace-nowrap"><thead class="bg-gray-100 text-slate-800 font-[Teko] border-b border-gray-200"><tr><th class="px-4 py-4 text-center tracking-wider text-xl font-bold text-slate-700">POS</th><th class="px-4 py-4 text-left tracking-wider text-xl font-bold text-slate-700">JUGADOR</th><th class="px-4 py-4 text-center tracking-wider text-xl font-bold text-slate-700">EQUIPO</th><th class="px-4 py-4 text-center tracking-wider text-xl font-bold text-slate-700">STAT</th></tr></thead><tbody class="divide-y divide-gray-100">`;
-            
-            if (data.length === 0) {
-                html += `<tr><td colspan="4" class="p-8 text-center text-slate-400 italic">No se encontraron lanzadores.</td></tr>`;
-            } else {
-                html += data.map((row, i) => {
-                    const pos = i + 1;
-                    const name = row[0] || '-';
-                    const team = row[1] || '-';
-                    const stat = row[2] || '-';
-                    
-                    let posBadge = 'bg-slate-200 text-slate-600';
-                    let rowClass = 'hover:bg-gray-50 transition text-slate-700';
-                    
-                    if(pos==1) { posBadge='gold-gradient text-white shadow-md'; rowClass += ' bg-blue-50/30'; }
-                    if(pos==2) { posBadge='silver-gradient text-slate-800'; }
-                    if(pos==3) { posBadge='bronze-gradient text-white'; }
-
-                    return `<tr class="${rowClass}">
-                        <td class="px-4 py-3 text-center"><span class="inline-flex w-8 h-8 rounded items-center justify-center text-sm font-black ${posBadge}">${pos}</span></td>
-                        <td class="px-4 py-3 font-bold text-slate-900 uppercase font-sport text-xl tracking-wide">${name}</td>
-                        <td class="px-4 py-3 text-center text-slate-500 uppercase text-xs font-bold">${team}</td>
-                        <td class="px-4 py-3 text-center font-black font-sport text-2xl text-blue-700 tracking-widest">${stat}</td>
-                    </tr>`;
-                }).join('');
-            }
-            html += `</tbody></table></div></div>`;
-            container.innerHTML = html;
-        }
-
         function processLeaderData(rows, config) {
             let groups = {};
             if (config.type === 'leader') {
@@ -477,28 +582,14 @@
             return groups;
         }
 
-        async function preloadLeaders() {
-            window.teamDetailedStats = {};
-            const leaderConfigs = TABS.filter(t => t.type === 'leader');
-            const promises = leaderConfigs.map(async config => {
-                try {
-                    const csvUrl = config.customUrl; let text = await fetchWithCache(csvUrl); const rows = parseCSV(text); const data = processLeaderData(rows, config);
-                    for (let group in data) { const leaders = data[group]; leaders.forEach(leader => { const teamName = leader.team.toUpperCase().trim(); if (!window.teamDetailedStats[teamName]) window.teamDetailedStats[teamName] = []; window.teamDetailedStats[teamName].push({ name: leader.name, type: config.label, value: leader.stat, rawValue: parseFloat(leader.stat) || 0 }); }); }
-                } catch (e) { console.warn(`No se pudo cargar líderes para ${config.label}`, e); }
-            });
-            await Promise.allSettled(promises);
-            console.log("Líderes precargados.");
-        }
-
         function renderTabs(filterType) {
             const container = document.getElementById('tabs-container');
             const filteredTabs = TABS.filter(t => t.type === filterType);
             container.innerHTML = filteredTabs.map(tab => {
-                const isLeader = tab.type === 'leader';
                 const activeClass = currentTabId === tab.id ? 'tab-active' : 'tab-inactive';
-                const borderClass = isLeader ? 'border-pega-gold/50' : '';
-                const content = isLeader 
-                    ? `<span class="flex items-center gap-1"><i data-lucide="${tab.icon}" class="w-3 h-3"></i> ${tab.name}</span>`
+                const borderClass = (tab.type === 'leader' || tab.type === 'pitchers') ? 'border-pega-gold/50' : '';
+                const content = (tab.type === 'leader' || tab.type === 'pitchers') 
+                    ? `<span class="flex items-center gap-1"><i data-lucide="${tab.icon || 'circle-dot'}" class="w-3 h-3"></i> ${tab.name}</span>`
                     : tab.name;
                 return `<button onclick="switchTab('${tab.id}')" class="px-3 py-2 md:px-5 md:py-2.5 rounded-lg font-bold text-xs md:text-sm tracking-wide transition-all transform hover:-translate-y-1 hover:shadow-lg ${activeClass} ${borderClass}">${content}</button>`;
             }).join('');
@@ -529,6 +620,7 @@
 
         function enterSection(type) {
             document.getElementById('home-menu').classList.add('hidden'); document.getElementById('back-btn').classList.remove('hidden'); document.getElementById('tabs-navigation').classList.add('hidden'); document.getElementById('data-container').classList.add('hidden'); document.getElementById('analysis-wrapper').classList.add('hidden'); document.getElementById('recent-results').classList.add('hidden'); document.getElementById('concentrados-section').classList.add('hidden');
+            if (type === 'pitchers') window.currentJornada = 1;
             if (type === 'concentrados') { renderConcentradosMenu(); document.getElementById('concentrados-section').classList.remove('hidden'); }
             else { document.getElementById('tabs-navigation').classList.remove('hidden'); document.getElementById('data-container').classList.remove('hidden'); if (type === 'standing') document.getElementById('analysis-wrapper').classList.remove('hidden'); renderTabs(type); const firstTab = TABS.find(t => t.type === type); if (firstTab) switchTab(firstTab.id); }
         }
@@ -557,47 +649,58 @@
                     let slicedRows = rows.slice(0, 45); 
                     let groupedData = processLeaderData(slicedRows, activeTab);
                     renderGroupedLeaderBoard(groupedData, activeTab);
+                
                 } else if (activeTab.type === 'pitchers') {
-                    const cleanRows = rows.filter(r => {
-                        const name = r[0] ? r[0].trim() : "";
-                        return name && name.toUpperCase() !== "NOMBRE" && name !== "-";
-                    }).map(r => [r[0], r[1], r[2]]); 
-                    renderPitchersTable(cleanRows);
+                    const colOffset = (window.currentJornada - 1) * 4;
+                    const cleanRows = rows.map(r => {
+                        const team = r[colOffset] ? r[colOffset].trim() : ""; 
+                        const name = r[colOffset + 1] ? r[colOffset + 1].trim() : ""; 
+                        const pitches = r[colOffset + 2] ? r[colOffset + 2].trim() : "";
+                        return { name, team, pitches };
+                    }).filter(r => {
+                        const n = r.name.toUpperCase();
+                        const t = r.team.toUpperCase();
+                        // Filtro anti-encabezados mejorado
+                        return n && n !== "NOMBRE" && n !== "JUGADOR" && !n.includes("JUGADORES") && !t.includes("EQUIPO") && n !== "-";
+                    });
+                    renderPitchersTable(cleanRows, activeTab.name);
+                
                 } else {
                     if (activeTab.sliceStart !== undefined && activeTab.sliceEnd !== undefined) {
                         rows = rows.slice(activeTab.sliceStart, activeTab.sliceEnd);
                     } else if (activeTab.maxRows) {
                         rows = rows.slice(0, activeTab.maxRows);
                     }
-                    let cleanRows;
-                    if (activeTab.hideLogo) {
-                         cleanRows = rows.filter(r => {
-                            let teamName = r[1] ? r[1].trim() : ""; 
-                            let pos = r[0] ? r[0].trim() : "";
-                            return r.length > 1 && pos !== "" && !pos.toUpperCase().includes("POS") && !teamName.toUpperCase().includes("EQUIPO") && teamName !== "-" && teamName !== "0";
-                        }).map(r => [r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8], ""]);
-                    } else {
-                        cleanRows = rows.filter(r => {
-                            let teamName = r[2] ? r[2].trim() : ""; 
-                            let pos = r[0] ? r[0].trim() : "";
-                            return r.length > 1 && pos !== "" && !pos.toUpperCase().includes("POS") && !teamName.toUpperCase().includes("EQUIPO") && teamName !== "-" && teamName !== "" && teamName !== "FOTO"; 
-                        }).map(r => [r[0], r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9], r[1]]);
-                    }
+                    
+                    let cleanRows = rows.filter(r => {
+                        let tc = activeTab.teamCol !== undefined ? activeTab.teamCol : (activeTab.hideLogo ? 1 : 2);
+                        let teamName = r[tc] ? r[tc].trim() : ""; 
+                        let pos = r[0] ? r[0].trim() : "";
+                        return r.length > 1 && pos !== "" && !pos.toUpperCase().includes("POS") && !teamName.toUpperCase().includes("EQUIPO") && teamName !== "-" && teamName !== "0" && teamName !== "FOTO";
+                    }).map(r => {
+                        let tc = activeTab.teamCol !== undefined ? activeTab.teamCol : (activeTab.hideLogo ? 1 : 2);
+                        let lc = activeTab.logoCol !== undefined ? activeTab.logoCol : 1;
+                        let jjC = activeTab.jjCol !== undefined ? activeTab.jjCol : (activeTab.hideLogo ? 2 : 3);
+                        let jgC = activeTab.jgCol !== undefined ? activeTab.jgCol : (activeTab.hideLogo ? 3 : 4);
+                        let jeC = activeTab.jeCol !== undefined ? activeTab.jeCol : (activeTab.hideLogo ? 4 : 5);
+                        let jpC = activeTab.jpCol !== undefined ? activeTab.jpCol : (activeTab.hideLogo ? 5 : 6);
+                        let cfC = activeTab.cfCol !== undefined ? activeTab.cfCol : (activeTab.hideLogo ? 6 : 7);
+                        let ccC = activeTab.ccCol !== undefined ? activeTab.ccCol : (activeTab.hideLogo ? 7 : 8);
+                        let difC = activeTab.difCol !== undefined ? activeTab.difCol : (activeTab.hideLogo ? 8 : 9);
+                        return [ r[0], r[tc], r[jjC], r[jgC], r[jeC], r[jpC], r[cfC], r[ccC], r[difC], activeTab.hideLogo ? "" : r[lc] ];
+                    });
                     globalData = cleanRows;
                     renderStandings(cleanRows, activeTab); 
                     loadedTeams = cleanRows.map(r => r[1]); 
                     updateUploadOptions();
                 }
-                if(forceRefresh) showToast("Datos actualizados", "success");
+                if(forceRefresh && activeTab.type !== 'pitchers') showToast("Datos actualizados", "success");
             } catch (error) {
                 console.error(error);
                 showToast("Error cargando datos.", "error");
                 container.innerHTML = `<div class="bg-red-50 border border-red-200 text-red-800 p-6 rounded-xl text-center"><i data-lucide="alert-triangle" class="w-8 h-8 mx-auto mb-2 text-red-500"></i><p>No se pudo conectar con la Hoja de Datos.</p></div>`;
                 refreshIcons();
-            } finally {
-                loader.style.display = 'none';
-                refreshIcons();
-            }
+            } finally { loader.style.display = 'none'; refreshIcons(); }
         }
         
         async function loadRecentResults(forceRefresh = false) {
@@ -624,6 +727,7 @@
             }
         }
 
+        // --- GLOBAL EXPORTS PARA ONCLICKS ---
         window.goHome = goHome;
         window.enterSection = enterSection;
         window.toggleMobileView = toggleMobileView;
