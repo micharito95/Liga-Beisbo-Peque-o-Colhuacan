@@ -236,7 +236,7 @@
         const HR_LEADERS_URL = 'https://docs.google.com/spreadsheets/d/1uWHj59A-Z1ty9FGUSGhtve2xq74mFuFStwR96Xi4_6Q/export?format=csv&gid=910137557';
         const JG_LEADERS_URL = 'https://docs.google.com/spreadsheets/d/1uWHj59A-Z1ty9FGUSGhtve2xq74mFuFStwR96Xi4_6Q/export?format=csv&gid=1289562111';
 
-        const CACHE_VERSION = "v1.47_all_categories_logos";
+        const CACHE_VERSION = "v1.48_preload_fix";
         const CACHE_DURATION = 60 * 60 * 1000; 
 
         const TABS = [
@@ -282,7 +282,6 @@
         let loadedTeams = [];
         window.teamDetailedStats = {}; 
 
-        // ----- FUNCIONES AUXILIARES -----
         function refreshIcons() { if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons(); }
         function toggleMobileView() { document.body.classList.toggle('mobile-view'); }
         function createAvatarHtml(name, extraClasses = "mx-auto") {
@@ -300,7 +299,6 @@
         }
         function parseCSV(text) { return text.split('\n').map(l => l.split(',').map(c => c ? c.trim().replace(/^"|"$/g, '') : '')); }
 
-        // ----- FUNCIONES DE RED -----
         async function fetchWithProxy(url) {
             const validateText = (text) => { if (text.trim().startsWith("<!DOCTYPE html") || text.trim().startsWith("<html")) throw new Error("HTML detectado"); return text; };
             try { const res = await fetch(url, { referrerPolicy: "no-referrer" }); if (res.ok) return validateText(await res.text()); } catch (e) { console.warn("Direct fail", e); }
@@ -317,7 +315,6 @@
             return data;
         }
 
-        // ----- FUNCIONES DE ANALISIS -----
         async function analyzeTeamRoster(teamName, rosterId) {
             try {
                 const queryUrl = `https://docs.google.com/spreadsheets/d/${rosterId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(teamName)}`;
@@ -414,9 +411,6 @@
             }, 500); 
         }
 
-        // ----- FUNCIONES UI & CARGA -----
-        
-        // FUNCIÓN CLAVE CORREGIDA PARA CONCENTRADOS
         function renderConcentradosMenu() {
             const container = document.getElementById('concentrados-grid');
             const groups = TABS.filter(t => t.type === 'standing');
@@ -436,13 +430,11 @@
                         const csvUrl = groupConfig.customUrl ? groupConfig.customUrl : `${BASE_SHEET_URL}?gid=${groupConfig.gid}&single=true&output=csv`;
                         let text = await fetchWithCache(csvUrl); let rows = parseCSV(text);
                         
-                        // CORRECCIÓN: Usar índices específicos de cada categoría
                         let tc = groupConfig.teamCol !== undefined ? groupConfig.teamCol : (groupConfig.hideLogo ? 1 : 2);
                         let lc = groupConfig.logoCol !== undefined ? groupConfig.logoCol : 1;
 
                         const teams = rows.filter(r => { 
                             const name = r[tc] ? r[tc].trim() : ""; 
-                            // Filtro estricto para ignorar encabezados
                             return name && !name.toUpperCase().includes("EQUIPO") && !name.toUpperCase().includes("GRUPO") && !name.toUpperCase().includes("POS") && name !== "-" && name !== "FOTO" && name !== "0"; 
                         }).map(r => ({ 
                             name: r[tc].trim(), 
@@ -498,27 +490,27 @@
             const container = document.getElementById('data-container');
             
             let selectorHtml = `
-            <div class="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6">
+            <div class="flex flex-col sm:flex-row justify-between items-center bg-white p-3 md:p-4 rounded-xl shadow-sm border border-gray-200 mb-4 md:mb-6">
                 <div class="flex items-center gap-3 mb-3 sm:mb-0">
-                    <div class="bg-blue-100 p-2 rounded-full"><i data-lucide="activity" class="w-5 h-5 text-blue-700"></i></div>
+                    <div class="bg-blue-100 p-2 rounded-full"><i data-lucide="activity" class="w-4 h-4 md:w-5 md:h-5 text-blue-700"></i></div>
                     <div>
-                        <h3 class="font-sport text-xl text-slate-800 uppercase leading-none">Conteo de Pitcheos</h3>
-                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">${tabName}</p>
+                        <h3 class="font-sport text-lg md:text-xl text-slate-800 uppercase leading-none">Conteo de Pitcheos</h3>
+                        <p class="text-[9px] md:text-[10px] text-slate-500 font-bold uppercase tracking-widest">${tabName}</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">Jornada:</label>
-                    <select onchange="changeJornada(this.value)" class="bg-gray-50 border border-gray-300 text-slate-900 text-sm rounded-lg focus:ring-pega-gold focus:border-pega-gold block p-2.5 font-bold outline-none cursor-pointer">
+                    <label class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest">Jornada:</label>
+                    <select onchange="changeJornada(this.value)" class="bg-gray-50 border border-gray-300 text-slate-900 text-xs md:text-sm rounded-lg focus:ring-pega-gold focus:border-pega-gold block p-2 md:p-2.5 font-bold outline-none cursor-pointer">
                         ${Array.from({length: 15}, (_, i) => `<option value="${i+1}" ${window.currentJornada == i+1 ? 'selected' : ''}>Jornada ${i+1}</option>`).join('')}
                     </select>
                 </div>
             </div>
             `;
 
-            let html = selectorHtml + `<div class="mlb-card rounded-xl overflow-hidden shadow-xl bg-white"><div class="overflow-x-auto custom-scrollbar"><table class="w-full whitespace-nowrap"><thead class="bg-gray-100 text-slate-800 font-[Teko] border-b border-gray-200"><tr><th class="px-4 py-4 text-center tracking-wider text-xl font-bold text-slate-700">EQUIPO</th><th class="px-4 py-4 text-left tracking-wider text-xl font-bold text-slate-700">PITCHER</th><th class="px-4 py-4 text-center tracking-wider text-xl font-bold text-slate-700">LANZAMIENTOS</th></tr></thead><tbody class="divide-y divide-gray-100">`;
+            let html = selectorHtml + `<div class="mlb-card rounded-xl overflow-hidden shadow-xl bg-white"><div class="overflow-x-auto custom-scrollbar"><table class="w-full"><thead class="bg-gray-100 text-slate-800 font-[Teko] border-b border-gray-200"><tr><th class="px-2 py-3 md:px-4 md:py-4 text-center tracking-wider text-base md:text-xl font-bold text-slate-700">EQUIPO</th><th class="px-2 py-3 md:px-4 md:py-4 text-left tracking-wider text-base md:text-xl font-bold text-slate-700">PITCHER</th><th class="px-2 py-3 md:px-4 md:py-4 text-center tracking-wider text-base md:text-xl font-bold text-slate-700">LANZAMIENTOS</th></tr></thead><tbody class="divide-y divide-gray-100">`;
             
             if (data.length === 0) {
-                html += `<tr><td colspan="3" class="p-12 text-center"><i data-lucide="calendar-x" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i><p class="text-slate-500 font-medium">No hay registros de lanzadores para la Jornada ${window.currentJornada}.</p></td></tr>`;
+                html += `<tr><td colspan="3" class="p-8 md:p-12 text-center"><i data-lucide="calendar-x" class="w-8 h-8 md:w-12 md:h-12 text-slate-300 mx-auto mb-2 md:mb-3"></i><p class="text-sm md:text-base text-slate-500 font-medium">No hay registros de lanzadores para la Jornada ${window.currentJornada}.</p></td></tr>`;
             } else {
                 html += data.map((row, i) => {
                     const team = row.team || '-';
@@ -530,14 +522,14 @@
                     else if (pitches > 40) pitchColor = "text-orange-500";
 
                     return `<tr class="hover:bg-gray-50 transition text-slate-700">
-                        <td class="px-4 py-3 text-center text-slate-500 uppercase text-xs font-bold">${team}</td>
-                        <td class="px-4 py-3 font-bold text-slate-900 uppercase font-sport text-xl tracking-wide">
-                            <div class="flex items-center gap-3">
-                                ${createAvatarHtml(name, "w-8 h-8 md:w-10 md:h-10")}
-                                <span>${name}</span>
+                        <td class="px-2 py-3 md:px-4 md:py-3 text-center text-slate-500 uppercase text-[9px] md:text-xs font-bold w-1/4 md:w-auto">${team}</td>
+                        <td class="px-2 py-3 md:px-4 md:py-3 font-bold text-slate-900 uppercase font-sport text-base md:text-xl tracking-wide w-1/2 md:w-auto">
+                            <div class="flex items-center gap-2 md:gap-3">
+                                ${createAvatarHtml(name, "w-6 h-6 md:w-10 md:h-10 text-[8px] md:text-sm flex-shrink-0")}
+                                <span class="whitespace-normal leading-none md:leading-normal break-words">${name}</span>
                             </div>
                         </td>
-                        <td class="px-4 py-3 text-center font-black font-sport text-3xl tracking-widest ${pitchColor}">${pitches > 0 ? pitches : row.pitches}</td>
+                        <td class="px-2 py-3 md:px-4 md:py-3 text-center font-black font-sport text-xl md:text-3xl tracking-widest ${pitchColor} w-1/4 md:w-auto">${pitches > 0 ? pitches : row.pitches}</td>
                     </tr>`;
                 }).join('');
             }
@@ -580,6 +572,19 @@
                 for (let g in groups) groups[g].sort((a, b) => parseFloat(b.stat) - parseFloat(a.stat)); return groups;
             }
             return groups;
+        }
+
+        async function preloadLeaders() {
+            window.teamDetailedStats = {};
+            const leaderConfigs = TABS.filter(t => t.type === 'leader');
+            const promises = leaderConfigs.map(async config => {
+                try {
+                    const csvUrl = config.customUrl; let text = await fetchWithCache(csvUrl); const rows = parseCSV(text); const data = processLeaderData(rows, config);
+                    for (let group in data) { const leaders = data[group]; leaders.forEach(leader => { const teamName = leader.team.toUpperCase().trim(); if (!window.teamDetailedStats[teamName]) window.teamDetailedStats[teamName] = []; window.teamDetailedStats[teamName].push({ name: leader.name, type: config.label, value: leader.stat, rawValue: parseFloat(leader.stat) || 0 }); }); }
+                } catch (e) { console.warn(`No se pudo cargar líderes para ${config.label}`, e); }
+            });
+            await Promise.allSettled(promises);
+            console.log("Líderes precargados.");
         }
 
         function renderTabs(filterType) {
@@ -660,7 +665,6 @@
                     }).filter(r => {
                         const n = r.name.toUpperCase();
                         const t = r.team.toUpperCase();
-                        // Filtro anti-encabezados mejorado
                         return n && n !== "NOMBRE" && n !== "JUGADOR" && !n.includes("JUGADORES") && !t.includes("EQUIPO") && n !== "-";
                     });
                     renderPitchersTable(cleanRows, activeTab.name);
