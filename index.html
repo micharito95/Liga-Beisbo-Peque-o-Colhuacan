@@ -236,7 +236,7 @@
         const HR_LEADERS_URL = 'https://docs.google.com/spreadsheets/d/1uWHj59A-Z1ty9FGUSGhtve2xq74mFuFStwR96Xi4_6Q/export?format=csv&gid=910137557';
         const JG_LEADERS_URL = 'https://docs.google.com/spreadsheets/d/1uWHj59A-Z1ty9FGUSGhtve2xq74mFuFStwR96Xi4_6Q/export?format=csv&gid=1289562111';
 
-        const CACHE_VERSION = "v1.48_preload_fix";
+        const CACHE_VERSION = "v1.52_juv_menor_pub";
         const CACHE_DURATION = 60 * 60 * 1000; 
 
         const TABS = [
@@ -271,9 +271,10 @@
             { id: 'leader-jg', name: 'JG', customUrl: JG_LEADERS_URL, type: 'leader', colStart: 0, nameCol: 0, teamCol: 1, statCol: 2, icon: 'trophy', color: 'from-yellow-500 to-yellow-700', label: 'JG' },
 
             { id: 'pitcher-pinguica', name: 'PINGUICA', customUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vStTdSz0minKt_Bu4u8-pyRJbqa4CO97xqVLdvBcSL_bkPLpQdkW24dRYuZhn5S4AlSjBD3cFAgwI-e/pub?gid=149099841&single=true&output=csv', type: 'pitchers' },
-            { id: 'pitcher-inf-menor', name: 'INF. MENOR', customUrl: 'https://docs.google.com/spreadsheets/d/1uWHj59A-Z1ty9FGUSGhtve2xq74mFuFStwR96Xi4_6Q/export?format=csv&gid=1807165843', type: 'pitchers' },
-            { id: 'pitcher-inf-mayor', name: 'INF. MAYOR', customUrl: 'https://docs.google.com/spreadsheets/d/1xHoUzjfZz7AUGq1cOMYZeubLCXCCXSsvWjrGbpAd_pQ/export?format=csv&gid=1956059983', type: 'pitchers' },
-            { id: 'pitcher-juv-menor', name: 'JUV. MENOR', customUrl: 'https://docs.google.com/spreadsheets/d/1KrCUR-402Fyfy_fVi4zI9J-3vtEfB79IlWGhnluSyTA/export?format=csv&gid=563800804', type: 'pitchers' }
+            { id: 'pitcher-inf-menor', name: 'INF. MENOR', customUrl: 'https://docs.google.com/spreadsheets/d/1uWHj59A-Z1ty9FGUSGhtve2xq74mFuFStwR96Xi4_6Q/export?format=csv&gid=1266024662', type: 'pitchers' },
+            { id: 'pitcher-inf-mayor', name: 'INF. MAYOR', customUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQpSp52YPDiuX0j5xdziA3coQZzcXNhxRfhM0PHzwPrEwKMdtPOCSKM-xJycHMX0VENvDOB7cFWJrY-/pub?gid=412716866&single=true&output=csv', type: 'pitchers' },
+            // URL DE JUVENIL MENOR ACTUALIZADA
+            { id: 'pitcher-juv-menor', name: 'JUV. MENOR', customUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTtdd0bPqnoTa6EFs0wQbMsW81MTcXIlkhpwMp_jLT0MEpCfHUsNsE6P7tRZCGyiMgRWO4atZqH6BAW/pub?gid=1090730518&single=true&output=csv', type: 'pitchers' }
         ];
 
         const DISPLAY_ORDER_PRIORITY = [ "ESCUELITA", "PINGUICA", "INF. MENOR", "INF. MAYOR", "JUV. MENOR" ];
@@ -300,12 +301,21 @@
         function parseCSV(text) { return text.split('\n').map(l => l.split(',').map(c => c ? c.trim().replace(/^"|"$/g, '') : '')); }
 
         async function fetchWithProxy(url) {
-            const validateText = (text) => { if (text.trim().startsWith("<!DOCTYPE html") || text.trim().startsWith("<html")) throw new Error("HTML detectado"); return text; };
-            try { const res = await fetch(url, { referrerPolicy: "no-referrer" }); if (res.ok) return validateText(await res.text()); } catch (e) { console.warn("Direct fail", e); }
-            try { const res = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`); if (res.ok) return validateText(await res.text()); } catch (e) { console.warn("Proxy 1 fail", e); }
-            try { const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`); if (res.ok) return validateText(await res.text()); } catch (e) { console.warn("Proxy 2 fail", e); }
+            const validateText = (text) => { 
+                if (!text) throw new Error("Respuesta vacía");
+                if (text.trim().startsWith("<!DOCTYPE html") || text.trim().startsWith("<html")) {
+                    console.warn("⚠️ Detectado HTML en lugar de datos CSV. Asegúrate de que el documento esté 'Publicado en la Web' y sea público.");
+                    throw new Error("HTML detectado");
+                }
+                return text; 
+            };
+            try { const res = await fetch(url, { referrerPolicy: "no-referrer" }); if (res.ok) return validateText(await res.text()); } catch (e) { console.warn("Intento directo falló", e.message); }
+            try { const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`); if (res.ok) { const data = await res.json(); return validateText(data.contents); } } catch (e) { console.warn("Proxy 1 falló", e.message); }
+            try { const res = await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`); if (res.ok) return validateText(await res.text()); } catch (e) { console.warn("Proxy 2 falló", e.message); }
+            try { const res = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`); if (res.ok) return validateText(await res.text()); } catch (e) { console.warn("Proxy 3 falló", e.message); }
             throw new Error("Conexión fallida");
         }
+        
         async function fetchWithCache(url, forceRefresh = false) {
             const cacheKey = CACHE_VERSION + "_" + url; let cachedData = null;
             if (!forceRefresh) { const cached = localStorage.getItem(cacheKey); if (cached) { try { const { timestamp, data } = JSON.parse(cached); if (Date.now() - timestamp < CACHE_DURATION) cachedData = data; } catch (e) {} } }
@@ -507,6 +517,7 @@
             </div>
             `;
 
+            // MODIFICADO: Quitada la clase whitespace-nowrap de la tabla para permitir que los nombres se ajusten en móvil
             let html = selectorHtml + `<div class="mlb-card rounded-xl overflow-hidden shadow-xl bg-white"><div class="overflow-x-auto custom-scrollbar"><table class="w-full"><thead class="bg-gray-100 text-slate-800 font-[Teko] border-b border-gray-200"><tr><th class="px-2 py-3 md:px-4 md:py-4 text-center tracking-wider text-base md:text-xl font-bold text-slate-700">EQUIPO</th><th class="px-2 py-3 md:px-4 md:py-4 text-left tracking-wider text-base md:text-xl font-bold text-slate-700">PITCHER</th><th class="px-2 py-3 md:px-4 md:py-4 text-center tracking-wider text-base md:text-xl font-bold text-slate-700">LANZAMIENTOS</th></tr></thead><tbody class="divide-y divide-gray-100">`;
             
             if (data.length === 0) {
@@ -743,7 +754,13 @@
         window.generateStaticAnalysis = generateStaticAnalysis;
         window.openUploadModal = openUploadModal;
 
-        document.addEventListener('DOMContentLoaded', () => { refreshIcons(); goHome(); preloadLeaders(); });
+        window.preloadLeaders = preloadLeaders;
+
+        document.addEventListener('DOMContentLoaded', () => { 
+            refreshIcons(); 
+            goHome(); 
+            if(typeof window.preloadLeaders === 'function') window.preloadLeaders(); 
+        });
     </script>
 </body>
 </html>
