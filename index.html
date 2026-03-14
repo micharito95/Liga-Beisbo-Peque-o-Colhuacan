@@ -236,9 +236,10 @@
         const HR_LEADERS_URL = 'https://docs.google.com/spreadsheets/d/1uWHj59A-Z1ty9FGUSGhtve2xq74mFuFStwR96Xi4_6Q/export?format=csv&gid=910137557';
         const JG_LEADERS_URL = 'https://docs.google.com/spreadsheets/d/1uWHj59A-Z1ty9FGUSGhtve2xq74mFuFStwR96Xi4_6Q/export?format=csv&gid=1289562111';
 
-        const CACHE_VERSION = "v1.52_juv_menor_pub";
+        const CACHE_VERSION = "v1.56_revert_to_shared_slices";
         const CACHE_DURATION = 60 * 60 * 1000; 
 
+        // RESTAURANDO LA CONFIGURACIÓN ORIGINAL DE LAS URL Y SLICES, CONSERVANDO LA LÓGICA DE LOGOS.
         const TABS = [
             { 
                 id: 'escuelita', name: 'ESCUELITA', customUrl: SHARED_CATEGORIES_URL, type: 'standing', sliceStart: 0, sliceEnd: 8, 
@@ -273,7 +274,6 @@
             { id: 'pitcher-pinguica', name: 'PINGUICA', customUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vStTdSz0minKt_Bu4u8-pyRJbqa4CO97xqVLdvBcSL_bkPLpQdkW24dRYuZhn5S4AlSjBD3cFAgwI-e/pub?gid=149099841&single=true&output=csv', type: 'pitchers' },
             { id: 'pitcher-inf-menor', name: 'INF. MENOR', customUrl: 'https://docs.google.com/spreadsheets/d/1uWHj59A-Z1ty9FGUSGhtve2xq74mFuFStwR96Xi4_6Q/export?format=csv&gid=1266024662', type: 'pitchers' },
             { id: 'pitcher-inf-mayor', name: 'INF. MAYOR', customUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQpSp52YPDiuX0j5xdziA3coQZzcXNhxRfhM0PHzwPrEwKMdtPOCSKM-xJycHMX0VENvDOB7cFWJrY-/pub?gid=412716866&single=true&output=csv', type: 'pitchers' },
-            // URL DE JUVENIL MENOR ACTUALIZADA
             { id: 'pitcher-juv-menor', name: 'JUV. MENOR', customUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTtdd0bPqnoTa6EFs0wQbMsW81MTcXIlkhpwMp_jLT0MEpCfHUsNsE6P7tRZCGyiMgRWO4atZqH6BAW/pub?gid=1090730518&single=true&output=csv', type: 'pitchers' }
         ];
 
@@ -440,6 +440,9 @@
                         const csvUrl = groupConfig.customUrl ? groupConfig.customUrl : `${BASE_SHEET_URL}?gid=${groupConfig.gid}&single=true&output=csv`;
                         let text = await fetchWithCache(csvUrl); let rows = parseCSV(text);
                         
+                        // RESTAURAMOS EL CORTE PARA LEER CORRECTAMENTE LA HOJA COMPARTIDA
+                        if (groupConfig.sliceStart !== undefined) rows = rows.slice(groupConfig.sliceStart, groupConfig.sliceEnd);
+                        
                         let tc = groupConfig.teamCol !== undefined ? groupConfig.teamCol : (groupConfig.hideLogo ? 1 : 2);
                         let lc = groupConfig.logoCol !== undefined ? groupConfig.logoCol : 1;
 
@@ -517,7 +520,6 @@
             </div>
             `;
 
-            // MODIFICADO: Quitada la clase whitespace-nowrap de la tabla para permitir que los nombres se ajusten en móvil
             let html = selectorHtml + `<div class="mlb-card rounded-xl overflow-hidden shadow-xl bg-white"><div class="overflow-x-auto custom-scrollbar"><table class="w-full"><thead class="bg-gray-100 text-slate-800 font-[Teko] border-b border-gray-200"><tr><th class="px-2 py-3 md:px-4 md:py-4 text-center tracking-wider text-base md:text-xl font-bold text-slate-700">EQUIPO</th><th class="px-2 py-3 md:px-4 md:py-4 text-left tracking-wider text-base md:text-xl font-bold text-slate-700">PITCHER</th><th class="px-2 py-3 md:px-4 md:py-4 text-center tracking-wider text-base md:text-xl font-bold text-slate-700">LANZAMIENTOS</th></tr></thead><tbody class="divide-y divide-gray-100">`;
             
             if (data.length === 0) {
@@ -676,11 +678,13 @@
                     }).filter(r => {
                         const n = r.name.toUpperCase();
                         const t = r.team.toUpperCase();
-                        return n && n !== "NOMBRE" && n !== "JUGADOR" && !n.includes("JUGADORES") && !t.includes("EQUIPO") && n !== "-";
+                        // FILTRO FUERTE: Eliminamos cualquier fila que sea encabezado
+                        return n && !n.includes("NOMBRE") && !n.includes("JUGADOR") && !n.includes("EQUIPO") && !t.includes("JUGADOR") && !t.includes("EQUIPO") && n !== "-";
                     });
                     renderPitchersTable(cleanRows, activeTab.name);
                 
                 } else {
+                    // RESTAURAMOS EL CORTE PARA LEER CORRECTAMENTE LA HOJA COMPARTIDA
                     if (activeTab.sliceStart !== undefined && activeTab.sliceEnd !== undefined) {
                         rows = rows.slice(activeTab.sliceStart, activeTab.sliceEnd);
                     } else if (activeTab.maxRows) {
