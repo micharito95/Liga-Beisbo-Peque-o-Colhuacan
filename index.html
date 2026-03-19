@@ -236,11 +236,16 @@
         const HR_LEADERS_URL = 'https://docs.google.com/spreadsheets/d/1uWHj59A-Z1ty9FGUSGhtve2xq74mFuFStwR96Xi4_6Q/export?format=csv&gid=910137557';
         const JG_LEADERS_URL = 'https://docs.google.com/spreadsheets/d/1uWHj59A-Z1ty9FGUSGhtve2xq74mFuFStwR96Xi4_6Q/export?format=csv&gid=1289562111';
 
-        const CACHE_VERSION = "v1.56_revert_to_shared_slices";
+        const CACHE_VERSION = "v1.62_panalitos_revert_url";
         const CACHE_DURATION = 60 * 60 * 1000; 
 
         // RESTAURANDO LA CONFIGURACIÓN ORIGINAL DE LAS URL Y SLICES, CONSERVANDO LA LÓGICA DE LOGOS.
         const TABS = [
+            { 
+                id: 'panalitos', name: 'PAÑALITOS', customUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRvZtzSyCQCe08JtsBhs39aUxcp2-yLT3xT8FYReMepbUA3pWL6fcYj8_LPVDVccWwI6Iz2REiZvW3m/pub?gid=1743149818&single=true&output=csv', type: 'standing', 
+                hideLogo: false, rosterId: '1OWGN6eeJyiLhcA6oG5GWwArwkztaX7Xio89QZ9cXtOQ', resultsGid: '0',
+                teamCol: 1, jjCol: 2, jgCol: 3, jeCol: 4, jpCol: 5, cfCol: 6, ccCol: 7, difCol: 8, logoCol: 10
+            },
             { 
                 id: 'escuelita', name: 'ESCUELITA', customUrl: SHARED_CATEGORIES_URL, type: 'standing', sliceStart: 0, sliceEnd: 8, 
                 hideLogo: false, rosterId: '1WO0IrL5c9GSlhV15-To_LJJlDnRl1XTvm8zU_HoHHUw', resultsGid: '0',
@@ -277,7 +282,7 @@
             { id: 'pitcher-juv-menor', name: 'JUV. MENOR', customUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTtdd0bPqnoTa6EFs0wQbMsW81MTcXIlkhpwMp_jLT0MEpCfHUsNsE6P7tRZCGyiMgRWO4atZqH6BAW/pub?gid=1090730518&single=true&output=csv', type: 'pitchers' }
         ];
 
-        const DISPLAY_ORDER_PRIORITY = [ "ESCUELITA", "PINGUICA", "INF. MENOR", "INF. MAYOR", "JUV. MENOR" ];
+        const DISPLAY_ORDER_PRIORITY = [ "PAÑALITOS", "ESCUELITA", "PINGUICA", "INF. MENOR", "INF. MAYOR", "JUV. MENOR" ];
         let currentTabId = null;
         let globalData = [];
         let loadedTeams = [];
@@ -695,7 +700,8 @@
                         let tc = activeTab.teamCol !== undefined ? activeTab.teamCol : (activeTab.hideLogo ? 1 : 2);
                         let teamName = r[tc] ? r[tc].trim() : ""; 
                         let pos = r[0] ? r[0].trim() : "";
-                        return r.length > 1 && pos !== "" && !pos.toUpperCase().includes("POS") && !teamName.toUpperCase().includes("EQUIPO") && teamName !== "-" && teamName !== "0" && teamName !== "FOTO";
+                        // Filtro reforzado para omitir equipos vacíos o con cualquier tipo de guión
+                        return r.length > 1 && pos !== "" && !pos.toUpperCase().includes("POS") && !teamName.toUpperCase().includes("EQUIPO") && teamName !== "-" && teamName !== "–" && teamName !== "—" && teamName !== "0" && teamName !== "FOTO" && teamName !== "";
                     }).map(r => {
                         let tc = activeTab.teamCol !== undefined ? activeTab.teamCol : (activeTab.hideLogo ? 1 : 2);
                         let lc = activeTab.logoCol !== undefined ? activeTab.logoCol : 1;
