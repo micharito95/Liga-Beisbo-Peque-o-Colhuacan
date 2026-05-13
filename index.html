@@ -228,22 +228,25 @@
     <!-- LOGICA DEL SITIO -->
     <script>
         window.currentJornada = 1;
-
         const BASE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRGTo3bXEvL_J54VjF26ilMUnTDPLXo0wkDTqdJ86I75WfDUyCu4lfeMupwOqL3KnJsAz4QPAy7oBw0/pub";
         const BASE_RESULTS_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR46Kv8lY9vPth9ztaF8l1sruX8wgNBTzvBIsl1i0c2bK0MI_PiLdaU1sKrTQOE3yGuEeY5owNK43gZ/pub";
+        
+        // URL Compartida (Copia de seguridad) - ACTUALIZADA A LA QUE NO TIENE BLOQUEOS
         const SHARED_CATEGORIES_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRJfECOTmITwrDrcznQE5xbF4hNEyJeRsN3SDiR6_4FZtscPqb4rd8gZv9RF-4363pMGcpDO6JIQKfT/pub?output=csv';
+        
+        // Regresamos a tu ruta central original que funciona perfecto para AVG
         const AVG_LEADERS_URL = 'https://docs.google.com/spreadsheets/d/1uWHj59A-Z1ty9FGUSGhtve2xq74mFuFStwR96Xi4_6Q/export?format=csv&gid=97814743';
         const HR_LEADERS_URL = 'https://docs.google.com/spreadsheets/d/1uWHj59A-Z1ty9FGUSGhtve2xq74mFuFStwR96Xi4_6Q/export?format=csv&gid=910137557';
         const JG_LEADERS_URL = 'https://docs.google.com/spreadsheets/d/1uWHj59A-Z1ty9FGUSGhtve2xq74mFuFStwR96Xi4_6Q/export?format=csv&gid=1289562111';
 
-        const CACHE_VERSION = "v1.64_restaurar_panalitos";
+        const CACHE_VERSION = "v1.81_panalitos_concentrados_final";
         const CACHE_DURATION = 60 * 60 * 1000; 
 
         // RESTAURANDO LA CONFIGURACIÓN ORIGINAL DE LAS URL Y SLICES, CONSERVANDO LA LÓGICA DE LOGOS.
         const TABS = [
             { 
                 id: 'panalitos', name: 'PAÑALITOS', customUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRvZtzSyCQCe08JtsBhs39aUxcp2-yLT3xT8FYReMepbUA3pWL6fcYj8_LPVDVccWwI6Iz2REiZvW3m/pub?gid=1743149818&single=true&output=csv', type: 'standing', 
-                hideLogo: false, rosterId: '1OWGN6eeJyiLhcA6oG5GWwArwkztaX7Xio89QZ9cXtOQ', resultsGid: '0',
+                hideLogo: false, rosterId: '153xCoIIh6rCSUHiQJm4WK30TJkbKG4vrb9eLSG-pD1Q', resultsGid: '0',
                 teamCol: 1, jjCol: 2, jgCol: 3, jeCol: 4, jpCol: 5, cfCol: 6, ccCol: 7, difCol: 8, logoCol: 10
             },
             { 
@@ -453,7 +456,8 @@
 
                         const teams = rows.filter(r => { 
                             const name = r[tc] ? r[tc].trim() : ""; 
-                            return name && !name.toUpperCase().includes("EQUIPO") && !name.toUpperCase().includes("GRUPO") && !name.toUpperCase().includes("POS") && name !== "-" && name !== "FOTO" && name !== "0"; 
+                            let pos = r[0] ? r[0].trim() : "";
+                            return r.length > 1 && pos !== "" && !pos.toUpperCase().includes("POS") && !name.toUpperCase().includes("EQUIPO") && !name.toUpperCase().includes("GRUPO") && name !== "-" && name !== "–" && name !== "—" && name !== "FOTO" && name !== "0" && name !== ""; 
                         }).map(r => ({ 
                             name: r[tc].trim(), 
                             logo: groupConfig.hideLogo ? "" : (r[lc] ? r[lc].trim() : "") 
@@ -583,8 +587,15 @@
         function processLeaderData(rows, config) {
             let groups = {};
             if (config.type === 'leader') {
-                let ranges = [{ name: "INF. MENOR", start: 0, end: 5 }, { name: "PINGUICA", start: 5, end: 10 }, { name: "INF. MAYOR", start: 10, end: 15 }, { name: "ESCUELITA", start: 15, end: 20 }, { name: "JUV. MENOR", start: 20, end: 26 }];
+                let ranges = [{ name: "INF. MENOR", start: 0, end: 5 }, { name: "PINGUICA", start: 5, end: 10 }, { name: "INF. MAYOR", start: 10, end: 15 }, { name: "ESCUELITA", start: 15, end: 20 }, { name: "JUV. MENOR", start: 20, end: 25 }];
+                
                 if (config.id === 'leader-jg') ranges = ranges.filter(r => r.name !== "ESCUELITA");
+                
+                // Agregar PAÑALITOS única y exclusivamente para AVG (filas 26 a la 30, indices 25 a 30)
+                if (config.id === 'leader-avg') {
+                    ranges.push({ name: "PAÑALITOS", start: 25, end: 30 });
+                }
+
                 ranges.forEach(range => { groups[range.name] = []; });
                 ranges.forEach(range => { const groupName = range.name; for (let i = range.start; i < range.end; i++) { if (i < rows.length) { const r = rows[i]; let player = { rank: 0, name: r[0] ? r[0].trim() : '', team: r[1] ? r[1].trim() : '', stat: r[2] ? r[2].trim() : '0' }; if (player.name && player.name !== "" && player.name !== "-" && player.name.toUpperCase() !== "NOMBRE" && player.stat !== "0") { if (!groups[groupName].some(p => p.name === player.name && p.team === player.team)) groups[groupName].push(player); } } } });
                 for (let g in groups) groups[g].sort((a, b) => parseFloat(b.stat) - parseFloat(a.stat)); return groups;
